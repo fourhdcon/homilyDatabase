@@ -13,7 +13,7 @@ void RestbedServer::defaultHandler(const std::shared_ptr<restbed::Session>& sess
 		const std::string loingForm = "<form action=\"auth\" method=\"get\">"
 									  "<input type=\"text\" name=\"username\"><br>"
 									  "<input type=\"password\" name=\"password\"><br>"
-									  "<input type=\"submit\" value=\"Zaloguj się\">"
+									  "<input type=\"submit\" value=\"Sign in\">"
 									  "</form><br><br>";
 		Tools::findAndReplace(response, "[[LOGINING]]", Tools::checkCookieAuth(session) ? "" : loingForm);
 	}

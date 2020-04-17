@@ -25,7 +25,7 @@ void RestbedServer::displaySingle(const std::shared_ptr<restbed::Session>& sessi
 	const auto request = session->get_request();
 
 	if (!request->has_query_parameter("id"))
-		Tools::closingSessionHandler(session, "Sorry, you must send id in get as parameter.");
+		Tools::closingSessionHandler(session, "No id parameter given");
 
 	const unsigned int id = static_cast<unsigned int>(std::stoi(request->get_query_parameter("id")));
 
@@ -52,14 +52,14 @@ void RestbedServer::displaySingle(const std::shared_ptr<restbed::Session>& sessi
 
 void RestbedServer::addingHandler(const std::shared_ptr<restbed::Session>& session) {
 	if (!Tools::checkCookieAuth(session))
-		Tools::closingSessionHandler(session, "Nie jesteś upoważniony");
+		Tools::closingSessionHandler(session, "You are not authorized");
 
 	Tools::closingSessionHandler(session, FileHandling::readFromFile("addForm.html"), false);
 }
 
 void RestbedServer::addingResultHandler(const std::shared_ptr<restbed::Session>& session) {
 	if (!Tools::checkCookieAuth(session))
-		Tools::closingSessionHandler(session, "Nie jesteś upoważniony");
+		Tools::closingSessionHandler(session, "You are not authorized");
 
 	const auto& request = session->get_request();
 	std::size_t content_length = static_cast<size_t>(request->get_header("Content-Length", 0));
@@ -98,9 +98,9 @@ void RestbedServer::addingResultHandler(const std::shared_ptr<restbed::Session>&
 
 	std::string response;
 	if (Database::insertNewHomily(std::move(databaseRow))) {
-		response = "Udało się";
+		response = "Inserting was successful";
 	} else {
-		response = "Nie udało się";
+		response = "Inserting encountered an error";
 	}
 
 	Tools::closingSessionHandler(session, std::move(response));
@@ -108,28 +108,28 @@ void RestbedServer::addingResultHandler(const std::shared_ptr<restbed::Session>&
 
 void RestbedServer::deletingHandler(const std::shared_ptr<restbed::Session>& session) {
 	if (!Tools::checkCookieAuth(session))
-		Tools::closingSessionHandler(session, "Nie jesteś upoważniony");
+		Tools::closingSessionHandler(session, "You are not authorized");
 
 	Tools::closingSessionHandler(session, FileHandling::readFromFile("deleteForm.html"), false);
 }
 
 void RestbedServer::deletingResultHandler(const std::shared_ptr<restbed::Session>& session) {
 	if (!Tools::checkCookieAuth(session))
-		Tools::closingSessionHandler(session, "Nie jesteś upoważniony");
+		Tools::closingSessionHandler(session, "You are not authorized");
 
 	const auto request = session->get_request();
 
 	if (!request->has_query_parameter("id"))
-		Tools::closingSessionHandler(session, "Sorry, you must send id in get as parameter.");
+		Tools::closingSessionHandler(session, "No id parameter given");
 
 	const unsigned int id = static_cast<unsigned int>(std::stoi(request->get_query_parameter("id")));
 
 	std::string response;
 
 	if (Database::deleteOneHomily(id)) {
-		response = "Udało się";
+		response = "Deleting was successful";
 	} else {
-		response = "Nie udało się";
+		response = "Deleting encountered an error";
 	}
 
 	Tools::closingSessionHandler(session, std::move(response));
@@ -148,7 +148,7 @@ void RestbedServer::authenticationHandler(const std::shared_ptr<restbed::Session
 	const auto request = session->get_request();
 
 	if (!request->has_query_parameter("username") || !request->has_query_parameter("password")) {
-		Tools::closingSessionHandler(session, "Sorry, you must send username and password in get as parameter.");
+		Tools::closingSessionHandler(session, "No username or password given");
 	}
 
 	const std::string username = request->get_query_parameter("username");
@@ -162,10 +162,10 @@ void RestbedServer::authenticationHandler(const std::shared_ptr<restbed::Session
 						   [](char c) { return !std::isalpha(c); }) != password.end();
 
 	if (doesPasswordContainsNonalpha || doesUsernameContainsNonalpha)
-		Tools::closingSessionHandler(session, "Bad username or password");
+		Tools::closingSessionHandler(session, "Not allowed characters in username or password");
 
 	if (username == "root" && password == "kucyk")
-		Tools::closingSessionHandler(session, "Udało się", true, std::make_pair("Set-Cookie", "auth=1"));
+		Tools::closingSessionHandler(session, "Login was successful", true, std::make_pair("Set-Cookie", "auth=1"));
 	else
 		Tools::closingSessionHandler(session, "Invalid username or password");
 }

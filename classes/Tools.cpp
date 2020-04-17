@@ -113,7 +113,7 @@ void Tools::closingSessionHandler(const std::shared_ptr<restbed::Session>& sessi
 								  const bool usingButton,
 								  const std::optional<std::pair<std::string, std::string>>& additionalHeader) {
 	if (usingButton) {
-		std::string comebackButton = "<br><a href=\"/\"><button type=\"button\">Wróć do strony głównej</button></a>";
+		std::string comebackButton = "<br><a href=\"/\"><button type=\"button\">Come back to main site</button></a>";
 		response += comebackButton;
 	}
 	std::multimap<std::string, std::string> headers{{"Content-Type",   "text/html; charset=utf-8"},

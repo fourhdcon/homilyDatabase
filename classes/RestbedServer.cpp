@@ -11,8 +11,8 @@ void RestbedServer::defaultHandler(const std::shared_ptr<restbed::Session>& sess
 	Tools::findAndReplace(response, "[[SELECT_ALL]]", Database::selectAll);
 	{
 		const std::string loingForm = "<form action=\"auth\" method=\"get\">"
-									  "<input type=\"text\" name=\"username\"><br>"
-									  "<input type=\"password\" name=\"password\"><br>"
+									  "<input type=\"text\" name=\"username\" required placeholder=\"username\"><br>"
+									  "<input type=\"password\" name=\"password\" required placeholder=\"password\"><br>"
 									  "<input type=\"submit\" value=\"Sign in\">"
 									  "</form><br><br>";
 		Tools::findAndReplace(response, "[[LOGINING]]", Tools::checkCookieAuth(session) ? "" : loingForm);

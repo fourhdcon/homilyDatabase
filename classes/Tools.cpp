@@ -4,19 +4,16 @@
 
 #include "Tools.h"
 
-[[nodiscard]]  std::vector<std::string> Tools::splitStringByAmpersand(std::string stringToSplit) {
+[[nodiscard]]  std::vector<std::string> Tools::splitStringByAmpersand(const std::string& stringToSplit) {
 	std::vector<std::string> result;
-	std::string segment;
-	std::string temp;
-	for (const auto c:stringToSplit) {
-		if (c == '&') {
-			result.push_back(temp);
-			temp = "";
-		} else
-			temp += c;
+	std::size_t last{}, next{};
+	const std::string delimiter = "&";
+	while ((next = stringToSplit.find('&', last)) != std::string::npos) {
+		result.emplace_back(stringToSplit.substr(last, next - last));
+		last = next + delimiter.size();
 	}
-	if (stringToSplit.back() != '&')
-		result.push_back(temp);
+	result.emplace_back(stringToSplit.substr(last));
+
 	return result;
 }
 
@@ -52,7 +49,7 @@
 
 typedef std::optional<std::pair<std::string, std::string>> optionalPairofStrings;
 
-[[nodiscard]] optionalPairofStrings Tools::splitStringByEqual(std::string stringToSplit) {
+[[nodiscard]] optionalPairofStrings Tools::splitStringByEqual(const std::string& stringToSplit) {
 	for (size_t i = 0; i < stringToSplit.length(); ++i) {
 		if (stringToSplit.at(i) == '=') {
 			std::string decodedToHTML;
@@ -112,10 +109,9 @@ void Tools::closingSessionHandler(const std::shared_ptr<restbed::Session>& sessi
 								  std::string&& response,
 								  const bool usingButton,
 								  const std::optional<std::pair<std::string, std::string>>& additionalHeader) {
-	if (usingButton) {
-		std::string comebackButton = "<br><a href=\"/\"><button type=\"button\">Come back to main site</button></a>";
-		response += comebackButton;
-	}
+	if (usingButton)
+		response += R"(<br><a href="/"><button type="button">Come back to main site</button></a>)";
+
 	std::multimap<std::string, std::string> headers{{"Content-Type",   "text/html; charset=utf-8"},
 													{"Content-Length", std::to_string(response.size())}};
 	if (additionalHeader.has_value())

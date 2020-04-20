@@ -22,7 +22,7 @@ class Tools {
 public:
 	static bool checkCookieAuth(const std::shared_ptr<restbed::Session>& session);
 
-	[[nodiscard]] static std::vector<std::string> splitStringByAmpersand(std::string stringToSplit);
+	[[nodiscard]] static std::vector<std::string> splitStringByAmpersand(const std::string& stringToSplit);
 
 	[[nodiscard]] static std::vector<std::string> splitStringByString(const std::string& stringToSplit,
 																	  const std::string& delimiter);
@@ -31,7 +31,7 @@ public:
 
 	[[nodiscard]] static std::string replacePlusesWithSpaces(std::string sourceString);
 
-	[[nodiscard]] static optionalPairofStrings splitStringByEqual(std::string stringToSplit);
+	[[nodiscard]] static optionalPairofStrings splitStringByEqual(const std::string& stringToSplit);
 
 	static void findAndReplace(std::string& base,
 							   const std::string& toReplace,

@@ -3,6 +3,8 @@ project(homilyDatabase)
 
 set(CMAKE_CXX_STANDARD 20)
 
+include(ExternalProject)
+
 # Debug and Release types of building
 if (CMAKE_BUILD_TYPE MATCHES Debug)
 	message(" ")
@@ -22,16 +24,34 @@ add_definitions(-DSPLITTER=<<std::string\(" | "\)<<)
 add_definitions(-DSPLITTERSTRING=+" | "+)
 
 # Include Fundation conmponent of Poco package
-find_package(Poco REQUIRED COMPONENTS Foundation)
+set(ENABLE_ENCODINGS "Enable Encodings" OFF)
+set(ENABLE_XML "Enable XML" OFF)
+set(ENABLE_JSON "Enable JSON" OFF)
+set(ENABLE_MONGODB "Enable MongoDB" OFF)
+set(ENABLE_DATA_SQLITE "Enable Data SQlite" OFF)
+set(ENABLE_REDIS "Enable Redis" OFF)
+set(ENABLE_UTIL "Enable Util" OFF)
+set(ENABLE_NET "Enable Net" OFF)
+set(ENABLE_ZIP "Enable Zip" OFF)
+set(ENABLE_PAGECOMPILER "Enable PageCompiler" OFF)
+set(ENABLE_PAGECOMPILER_FILE2PAGE "Enable File2Page" OFF)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/libs/poco)
+include_directories(${CMAKE_CURRENT_LIST_DIR}/libs/poco/Foundation/include)
 
 # Add and include SQLiteCpp package - handling connection with database
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/libs/SQLiteCpp)
 include_directories(${CMAKE_CURRENT_LIST_DIR}/libs/SQLiteCpp/include)
 
 # Add and include restbed package - serving http
-set(BUILD_SSL OFF CACHE BOOL "Build secure socket layer support." FORCE)
-add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/libs/restbed)
-include_directories(${CMAKE_CURRENT_LIST_DIR}/libs/restbed/include)
+externalproject_add(restbed
+					PREFIX ${CMAKE_BINARY_DIR}/libs/restbed
+					SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/libs/restbed
+					BINARY_DIR ${CMAKE_BINARY_DIR}/libs/restbed
+					CMAKE_CACHE_ARGS -DBUILD_SSL:BOOL=OFF
+					-DBUILD_TESTS:BOOL=OFF)
+externalproject_get_property(restbed install_dir)
+include_directories(${install_dir}/include)
 
 # Include HTMLEntitiesToUTF8 package - replacing HTML entities in code to UTF-8 characters
 include_directories(${CMAKE_CURRENT_LIST_DIR}/libs/HTMLEntitiesToUTF8)
@@ -62,10 +82,14 @@ file(GLOB sources ${CMAKE_SOURCE_DIR}/classes/*.cpp)
 # Add executable homilyDatabase with source: main.cpp and all files from classes
 add_executable(homilyDatabase main.cpp ${headers} ${sources})
 
-# Link SQLiteCpp, sqlite3, pthread and Fundation from Poco to executable
-target_link_libraries(homilyDatabase SQLiteCpp sqlite3 pthread Poco::Foundation)
+# Link SQLiteCpp, sqlite3 and pthread to executable
+target_link_libraries(homilyDatabase SQLiteCpp sqlite3 pthread)
+
+# Link Foundation library
+target_link_libraries(homilyDatabase Poco::Foundation)
 
 # Link restbed to executable
+add_dependencies(homilyDatabase restbed)
 target_link_libraries(homilyDatabase ${CMAKE_BINARY_DIR}/libs/restbed/librestbed.a)
 
 # Link HTMLEntitiesToUTF8 to executable

@@ -1,9 +1,11 @@
 cmake_minimum_required(VERSION 3.15)
 project(homilyDatabase)
 
-set(CMAKE_CXX_STANDARD 20)
+#[[
+		DEFINITIONS
+]]
 
-include(ExternalProject)
+set(CMAKE_CXX_STANDARD 20)
 
 # Debug and Release types of building
 if (CMAKE_BUILD_TYPE MATCHES Debug)
@@ -23,14 +25,23 @@ endif ()
 add_definitions(-DSPLITTER=<<std::string\(" | "\)<<)
 add_definitions(-DSPLITTERSTRING=+" | "+)
 
-# Include Poco::Foundation source files
+# Set headers and sources variables that contains filenames of classes in classes dir
+file(GLOB headers ${CMAKE_SOURCE_DIR}/classes/*.h)
+file(GLOB sources ${CMAKE_SOURCE_DIR}/classes/*.cpp)
+
+#[[
+		LIBRARIES
+]]
+
+# Poco::Foundation
 include_directories(${CMAKE_CURRENT_LIST_DIR}/libs/poco/include)
 
-# Add and include SQLiteCpp package - handling connection with database
+# SQLiteCpp
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/libs/SQLiteCpp)
 include_directories(${CMAKE_CURRENT_LIST_DIR}/libs/SQLiteCpp/include)
 
-# Add and include restbed package - serving http
+# restbed
+include(ExternalProject)
 externalproject_add(restbed
 					PREFIX ${CMAKE_BINARY_DIR}/libs/restbed
 					SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/libs/restbed
@@ -40,8 +51,12 @@ externalproject_add(restbed
 externalproject_get_property(restbed install_dir)
 include_directories(${install_dir}/include)
 
-# Include HTMLEntitiesToUTF8 package - replacing HTML entities in code to UTF-8 characters
+# HTMLEntitiesToUTF8
 include_directories(${CMAKE_CURRENT_LIST_DIR}/libs/HTMLEntitiesToUTF8)
+
+#[[
+		EXECUTABLE
+]]
 
 # Add warnings for main source
 add_compile_options(-Wall
@@ -62,18 +77,13 @@ add_compile_options(-Wall
 					-Wsign-conversion
 					-Wmisleading-indentation)
 
-# Set headers and sources variables that contains filenames of classes in classes dir
-file(GLOB headers ${CMAKE_SOURCE_DIR}/classes/*.h)
-file(GLOB sources ${CMAKE_SOURCE_DIR}/classes/*.cpp)
-
-# Add executable homilyDatabase with source: main.cpp and all files from classes
+# Add executable homilyDatabase with source: main.cpp and all files from classes(DIR)
 add_executable(homilyDatabase main.cpp ${headers} ${sources})
 
 # Link SQLiteCpp, sqlite3 and pthread to executable
 target_link_libraries(homilyDatabase SQLiteCpp sqlite3 pthread)
 
-# Link Foundation library
-#target_link_libraries(homilyDatabase Poco::Foundation)
+# Link Poco::Foundation to executable
 target_link_libraries(homilyDatabase PocoFoundation)
 
 # Link restbed to executable
@@ -85,6 +95,10 @@ target_link_libraries(homilyDatabase ${CMAKE_SOURCE_DIR}/libs/HTMLEntitiesToUTF8
 
 # Set static type of build
 target_link_libraries(homilyDatabase -static)
+
+#[[
+		OTHER FILES
+]]
 
 # Copy database to executable folder
 configure_file(homilyDatabase.db homilyDatabase.db COPYONLY)

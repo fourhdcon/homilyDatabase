@@ -23,21 +23,8 @@ endif ()
 add_definitions(-DSPLITTER=<<std::string\(" | "\)<<)
 add_definitions(-DSPLITTERSTRING=+" | "+)
 
-# Include Fundation conmponent of Poco package
-set(ENABLE_ENCODINGS "Enable Encodings" OFF)
-set(ENABLE_XML "Enable XML" OFF)
-set(ENABLE_JSON "Enable JSON" OFF)
-set(ENABLE_MONGODB "Enable MongoDB" OFF)
-set(ENABLE_DATA_SQLITE "Enable Data SQlite" OFF)
-set(ENABLE_REDIS "Enable Redis" OFF)
-set(ENABLE_UTIL "Enable Util" OFF)
-set(ENABLE_NET "Enable Net" OFF)
-set(ENABLE_ZIP "Enable Zip" OFF)
-set(ENABLE_PAGECOMPILER "Enable PageCompiler" OFF)
-set(ENABLE_PAGECOMPILER_FILE2PAGE "Enable File2Page" OFF)
-set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
-add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/libs/poco)
-include_directories(${CMAKE_CURRENT_LIST_DIR}/libs/poco/Foundation/include)
+# Include Poco::Foundation source files
+include_directories(${CMAKE_CURRENT_LIST_DIR}/libs/poco/include)
 
 # Add and include SQLiteCpp package - handling connection with database
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/libs/SQLiteCpp)
@@ -86,7 +73,8 @@ add_executable(homilyDatabase main.cpp ${headers} ${sources})
 target_link_libraries(homilyDatabase SQLiteCpp sqlite3 pthread)
 
 # Link Foundation library
-target_link_libraries(homilyDatabase Poco::Foundation)
+#target_link_libraries(homilyDatabase Poco::Foundation)
+target_link_libraries(homilyDatabase PocoFoundation)
 
 # Link restbed to executable
 add_dependencies(homilyDatabase restbed)

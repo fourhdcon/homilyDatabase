@@ -4,6 +4,3 @@
 [submodule "libs/restbed"]
 	path = libs/restbed
 	url = https://github.com/Corvusoft/restbed
-[submodule "libs/poco"]
-	path = libs/poco
-	url = https://github.com/pocoproject/poco.git

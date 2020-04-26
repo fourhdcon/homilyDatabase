@@ -19,6 +19,8 @@ elseif (CMAKE_BUILD_TYPE MATCHES Release)
 	message(" ")
 	add_definitions(-DRelease)
 	add_compile_options(-O3)
+else ()
+	add_definitions(-DRelease)
 endif ()
 
 # Replecing SPLITTER and SPLITTERSTRING in source code
@@ -46,6 +48,7 @@ externalproject_add(restbed
 					PREFIX ${CMAKE_BINARY_DIR}/libs/restbed
 					SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/libs/restbed
 					BINARY_DIR ${CMAKE_BINARY_DIR}/libs/restbed
+					INSTALL_COMMAND ""
 					CMAKE_CACHE_ARGS -DBUILD_SSL:BOOL=OFF
 					-DBUILD_TESTS:BOOL=OFF)
 externalproject_get_property(restbed install_dir)
@@ -100,9 +103,16 @@ target_link_libraries(homilyDatabase -static)
 		OTHER FILES
 ]]
 
-# Copy database to executable folder
-configure_file(homilyDatabase.db homilyDatabase.db COPYONLY)
-
 # Copy all html files from htmls dir to executable folder
 file(GLOB PUBLIC_HTMLS "htmls/*.html")
-file(COPY ${PUBLIC_HTMLS} DESTINATION ${CMAKE_BINARY_DIR})
+add_custom_command(TARGET homilyDatabase POST_BUILD
+				   COMMAND ${CMAKE_COMMAND} -E copy_if_different
+				   ${PUBLIC_HTMLS}
+				   $<TARGET_FILE_DIR:homilyDatabase>)
+
+# Copy all database files from main folder to executable folder
+file(GLOB DATABASE_PUBLIC "*.db")
+add_custom_command(TARGET homilyDatabase POST_BUILD
+				   COMMAND ${CMAKE_COMMAND} -E copy_if_different
+				   ${DATABASE_PUBLIC}
+				   $<TARGET_FILE_DIR:homilyDatabase>)

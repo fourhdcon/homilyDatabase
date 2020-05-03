@@ -10,6 +10,7 @@
 #include <string>
 #include <utility>
 #include <functional>
+#include <optional>
 #include <restbed>
 #include <Poco/URI.h>
 #include "FileHandling.h"

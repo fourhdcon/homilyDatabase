@@ -5,6 +5,8 @@
 #include "RestbedServer.h"
 #include "Tools.h"
 #include <cctype>
+#include <optional>
+#include <utility>
 
 void RestbedServer::defaultHandler(const std::shared_ptr<restbed::Session>& session) {
 	std::string response = FileHandling::readFromFile("index.html");
